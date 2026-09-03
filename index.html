@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FS Medya</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:#0b0b12;color:#fff}
@@ -29,69 +33,209 @@ button{width:100%;border:0;border-radius:14px;padding:15px;margin-top:11px;font-
 .menu button{margin:0}
 </style>
 </head>
+
 <body>
+
 <div class="app">
+
 <div class="logo">FS MEDYA</div>
 <div class="sub">Creator Network • Sosyal Medya Topluluğu</div>
+
 <div class="card">
-<div class="title">Hoş geldin 👋</div>
-<div class="muted">FS Medya creator topluluğuna katıl.</div>
+
+<div class="title" id="welcomeText">Hoş geldin 👋</div>
+
+<div class="muted">
+FS Medya creator topluluğuna katıl.
+</div>
+
 <div class="stats">
+
 <div class="stat">
 <div class="muted">Puan</div>
-<div class="number">0</div>
+<div class="number" id="points">0</div>
 </div>
+
 <div class="stat">
 <div class="muted">Seviye</div>
-<div class="number">1</div>
+<div class="number" id="level">1</div>
 </div>
+
 </div>
+
 <div class="team">
-<b>Ekibin</b> <span class="muted">0 / 5</span>
-<div class="bar"><div class="fill"></div></div>
+<b>Ekibin</b> <span class="muted" id="teamCount">0 / 5</span>
+<div class="bar">
+<div class="fill" id="teamBar"></div>
 </div>
-<button class="primary" onclick="invite()">👥 5 Kişi Davet Et</button>
 </div>
+
+<button class="primary" onclick="invite()">
+👥 5 Kişi Davet Et
+</button>
+
+</div>
+
 <!-- DUYURULAR -->
+
 <div class="card">
+
 <div class="title">📢 Duyurular</div>
+
 <div class="notice">
 <b>FS Medya'ya Hoş Geldiniz!</b>
-<div class="muted">Yeni görevler ve etkinlikler burada paylaşılacak.</div>
+<div class="muted">
+Yeni görevler ve etkinlikler burada paylaşılacak.
 </div>
+</div>
+
 <div class="notice">
 <b>Yeni Creator Görevleri</b>
-<div class="muted">Yakında yeni sosyal medya görevleri aktif olacak.</div>
+<div class="muted">
+Yakında yeni sosyal medya görevleri aktif olacak.
 </div>
 </div>
+
+</div>
+
 <!-- ETKİNLİKLER -->
+
 <div class="card">
+
 <div class="title">🎉 Etkinlikler</div>
+
 <div class="event">
 <b>🏆 FS Medya Creator Challenge</b>
-<div class="muted">En aktif creator'lar arasında yarış. Ödüller ve özel seviyeler için puan topla.</div>
+<div class="muted">
+En aktif creator'lar arasında yarış. Ödüller ve özel seviyeler için puan topla.
+</div>
 <button class="secondary">Etkinliği Gör</button>
 </div>
+
 <div class="event">
 <b>🔥 Haftanın Creator'ı</b>
-<div class="muted">Haftanın en aktif creator'ı liderlik tablosunda öne çıkacak.</div>
+<div class="muted">
+Haftanın en aktif creator'ı liderlik tablosunda öne çıkacak.
+</div>
 <button class="secondary">Detayları Gör</button>
 </div>
+
 </div>
+
 <!-- MENÜ -->
+
 <div class="card">
+
 <div class="menu">
 <button class="secondary">📋 Görevler</button>
 <button class="secondary">🏆 Liderlik</button>
 <button class="secondary">👤 Profil</button>
 <button class="secondary">❤️ Etkileşimler</button>
 </div>
+
 </div>
+
 </div>
+
 <script>
-function invite(){
-alert("Davet sistemi yakında aktif olacak.");
+
+// TELEGRAM
+const tg = window.Telegram.WebApp;
+
+tg.ready();
+tg.expand();
+
+const telegramUser = tg.initDataUnsafe?.user || null;
+
+
+// SUPABASE
+const SUPABASE_URL = "https://puhnsqblngatozegnvna.supabase.co";
+
+const SUPABASE_KEY = "sb_publishable_DjbJUm2z0IPSEEjZ8ool9g_I2beoeEP";
+
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+
+// KULLANICI BİLGİSİ
+async function loadUser(){
+
+    if(!telegramUser){
+        document.getElementById("welcomeText").textContent =
+        "Hoş geldin 👋";
+
+        return;
+    }
+
+    const name =
+        telegramUser.first_name ||
+        telegramUser.username ||
+        "Creator";
+
+    document.getElementById("welcomeText").textContent =
+        "Hoş geldin " + name + " 👋";
+
+
+    // SUPABASE'E KULLANICI KAYDI
+    const { data, error } = await supabaseClient
+        .from("Users")
+        .upsert(
+        {
+            telegram_id: String(telegramUser.id),
+            username: telegramUser.username || "",
+            first_name: telegramUser.first_name || "",
+            points: 0,
+            team_count: 0
+        },
+        {
+            onConflict: "telegram_id"
+        }
+        )
+        .select()
+        .single();
+
+
+    if(error){
+        console.log("Supabase kullanıcı kayıt hatası:", error);
+        return;
+    }
+
+
+    if(data){
+
+        document.getElementById("points").textContent =
+        data.points ?? 0;
+
+        document.getElementById("teamCount").textContent =
+        (data.team_count ?? 0) + " / 5";
+
+        document.getElementById("teamBar").style.width =
+        Math.min((data.team_count ?? 0) * 20, 100) + "%";
+
+        document.getElementById("level").textContent =
+        Math.floor((data.points ?? 0) / 100) + 1;
+    }
 }
+
+
+// DAVET
+function invite(){
+
+    if(!telegramUser){
+        alert("FS Medya'yı Telegram üzerinden açmalısın.");
+        return;
+    }
+
+    alert("Davet sistemi birazdan aktif olacak 🚀");
+}
+
+
+// BAŞLAT
+loadUser();
+
 </script>
+
 </body>
 </html>
