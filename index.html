@@ -76,8 +76,6 @@ FS Medya creator topluluğuna katıl.
 
 </div>
 
-<!-- DUYURULAR -->
-
 <div class="card">
 
 <div class="title">📢 Duyurular</div>
@@ -97,8 +95,6 @@ Yakında yeni sosyal medya görevleri aktif olacak.
 </div>
 
 </div>
-
-<!-- ETKİNLİKLER -->
 
 <div class="card">
 
@@ -122,8 +118,6 @@ Haftanın en aktif creator'ı liderlik tablosunda öne çıkacak.
 
 </div>
 
-<!-- MENÜ -->
-
 <div class="card">
 
 <div class="menu">
@@ -139,7 +133,6 @@ Haftanın en aktif creator'ı liderlik tablosunda öne çıkacak.
 
 <script>
 
-// TELEGRAM
 const tg = window.Telegram.WebApp;
 
 tg.ready();
@@ -147,8 +140,6 @@ tg.expand();
 
 const telegramUser = tg.initDataUnsafe?.user || null;
 
-
-// SUPABASE
 const SUPABASE_URL = "https://puhnsqblngatozegnvna.supabase.co";
 
 const SUPABASE_KEY = "sb_publishable_DjbJUm2z0IPSEEjZ8ool9g_I2beoeEP";
@@ -158,14 +149,11 @@ const supabaseClient = window.supabase.createClient(
     SUPABASE_KEY
 );
 
-
-// KULLANICI BİLGİSİ
 async function loadUser(){
 
     if(!telegramUser){
         document.getElementById("welcomeText").textContent =
         "Hoş geldin 👋";
-
         return;
     }
 
@@ -177,50 +165,62 @@ async function loadUser(){
     document.getElementById("welcomeText").textContent =
         "Hoş geldin " + name + " 👋";
 
-
-    // SUPABASE'E KULLANICI KAYDI
-    const { data, error } = await supabaseClient
+    // Önce kullanıcıyı kontrol et
+    const { data: existingUser, error: selectError } =
+        await supabaseClient
         .from("Users")
-        .upsert(
-        {
-            telegram_id: String(telegramUser.id),
-            username: telegramUser.username || "",
-            first_name: telegramUser.first_name || "",
-            points: 0,
-            team_count: 0
-        },
-        {
-            onConflict: "telegram_id"
-        }
-        )
-        .select()
-        .single();
+        .select("*")
+        .eq("telegram_id", String(telegramUser.id))
+        .maybeSingle();
 
-
-    if(error){
-        console.log("Supabase kullanıcı kayıt hatası:", error);
+    if(selectError){
+        console.error("Kullanıcı kontrol hatası:", selectError);
         return;
     }
 
+    let userData = existingUser;
 
-    if(data){
+    // Kullanıcı yoksa oluştur
+    if(!existingUser){
+
+        const { data: newUser, error: insertError } =
+            await supabaseClient
+            .from("Users")
+            .insert({
+                telegram_id: String(telegramUser.id),
+                username: telegramUser.username || "",
+                first_name: telegramUser.first_name || "",
+                points: 0,
+                team_count: 0
+            })
+            .select()
+            .single();
+
+        if(insertError){
+            console.error("Supabase kayıt hatası:", insertError);
+            return;
+        }
+
+        userData = newUser;
+    }
+
+    // Kullanıcı bilgilerini güncelle
+    if(userData){
 
         document.getElementById("points").textContent =
-        data.points ?? 0;
+            userData.points ?? 0;
 
         document.getElementById("teamCount").textContent =
-        (data.team_count ?? 0) + " / 5";
+            (userData.team_count ?? 0) + " / 5";
 
         document.getElementById("teamBar").style.width =
-        Math.min((data.team_count ?? 0) * 20, 100) + "%";
+            Math.min((userData.team_count ?? 0) * 20, 100) + "%";
 
         document.getElementById("level").textContent =
-        Math.floor((data.points ?? 0) / 100) + 1;
+            Math.floor((userData.points ?? 0) / 100) + 1;
     }
 }
 
-
-// DAVET
 function invite(){
 
     if(!telegramUser){
@@ -231,8 +231,6 @@ function invite(){
     alert("Davet sistemi birazdan aktif olacak 🚀");
 }
 
-
-// BAŞLAT
 loadUser();
 
 </script>
