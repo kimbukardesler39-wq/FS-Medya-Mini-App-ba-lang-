@@ -1,49 +1,97 @@
 <!DOCTYPE html>
-
 <html lang="tr">
-
 <head>
-
-  <meta charset="UTF-8">
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>FS Medya</title>
-
-  <style>
-
-    * {
-
-      box-sizing: border-box;
-
-      margin: 0;
-
-      padding: 0;
-
-      font-family: Arial, sans-serif;
-
-    }
-
-    body {
-
-      background: #f4f6fb;
-
-      color: #111827;
-
-    }
-
-    .app {
-
-      max-width: 480px;
-
-      min-height: 100vh;
-
-      margin: auto;
-
-      padding: 20px;
-
-    }
-
-    .header {
-
-      background: linear-gradi
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FS Medya</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#0b0b12;color:#fff}
+.app{max-width:480px;margin:auto;min-height:100vh;padding:22px}
+.logo{text-align:center;font-size:30px;font-weight:900;margin:10px 0 4px}
+.sub{text-align:center;color:#999;margin-bottom:22px}
+.card{background:#171722;border-radius:20px;padding:18px;margin-bottom:15px}
+.title{font-size:19px;font-weight:800;margin-bottom:7px}
+.muted{color:#999;font-size:14px;line-height:1.4}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.stat{background:#20202d;padding:15px;border-radius:15px}
+.number{font-size:24px;font-weight:800;margin-top:5px}
+.team{margin-top:16px}
+.bar{height:8px;background:#30303d;border-radius:10px;overflow:hidden;margin-top:9px}
+.fill{width:0%;height:100%;background:#fff}
+button{width:100%;border:0;border-radius:14px;padding:15px;margin-top:11px;font-size:15px;font-weight:700}
+.primary{background:#fff;color:#111}
+.secondary{background:#252532;color:#fff}
+.notice{border-left:4px solid #fff;padding-left:12px;margin-top:12px}
+.event{background:#20202d;border-radius:14px;padding:14px;margin-top:10px}
+.event b{display:block;margin-bottom:5px}
+.menu{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.menu button{margin:0}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="logo">FS MEDYA</div>
+<div class="sub">Creator Network • Sosyal Medya Topluluğu</div>
+<div class="card">
+<div class="title">Hoş geldin 👋</div>
+<div class="muted">FS Medya creator topluluğuna katıl.</div>
+<div class="stats">
+<div class="stat">
+<div class="muted">Puan</div>
+<div class="number">0</div>
+</div>
+<div class="stat">
+<div class="muted">Seviye</div>
+<div class="number">1</div>
+</div>
+</div>
+<div class="team">
+<b>Ekibin</b> <span class="muted">0 / 5</span>
+<div class="bar"><div class="fill"></div></div>
+</div>
+<button class="primary" onclick="invite()">👥 5 Kişi Davet Et</button>
+</div>
+<!-- DUYURULAR -->
+<div class="card">
+<div class="title">📢 Duyurular</div>
+<div class="notice">
+<b>FS Medya'ya Hoş Geldiniz!</b>
+<div class="muted">Yeni görevler ve etkinlikler burada paylaşılacak.</div>
+</div>
+<div class="notice">
+<b>Yeni Creator Görevleri</b>
+<div class="muted">Yakında yeni sosyal medya görevleri aktif olacak.</div>
+</div>
+</div>
+<!-- ETKİNLİKLER -->
+<div class="card">
+<div class="title">🎉 Etkinlikler</div>
+<div class="event">
+<b>🏆 FS Medya Creator Challenge</b>
+<div class="muted">En aktif creator'lar arasında yarış. Ödüller ve özel seviyeler için puan topla.</div>
+<button class="secondary">Etkinliği Gör</button>
+</div>
+<div class="event">
+<b>🔥 Haftanın Creator'ı</b>
+<div class="muted">Haftanın en aktif creator'ı liderlik tablosunda öne çıkacak.</div>
+<button class="secondary">Detayları Gör</button>
+</div>
+</div>
+<!-- MENÜ -->
+<div class="card">
+<div class="menu">
+<button class="secondary">📋 Görevler</button>
+<button class="secondary">🏆 Liderlik</button>
+<button class="secondary">👤 Profil</button>
+<button class="secondary">❤️ Etkileşimler</button>
+</div>
+</div>
+</div>
+<script>
+function invite(){
+alert("Davet sistemi yakında aktif olacak.");
+}
+</script>
+</body>
+</html>
